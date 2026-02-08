@@ -31,8 +31,14 @@ class Usuario(Resource): #A la clase usuario le indico que va a ser del tipo rec
     @role_required(roles = ["admin"])
     def put(self, id):
         usuario = db.session.query(UsuarioModel).get_or_404(id)
-        data = request.get_json().items()
+        payload = request.get_json() or {}
+        errors, cleaned = UsuarioModel.validate_numeric_fields(payload)
+        if errors:
+            return {'error': 'Datos inválidos', 'fields': errors}, 400
+        data = payload.items()
         for key, value in data:
+            if key in cleaned:
+                value = cleaned[key]
             setattr(usuario, key, value)
         db.session.add(usuario)
         db.session.commit()
@@ -95,7 +101,12 @@ class Usuarios(Resource):
 
     def post(self):
         try:
-            usuario = UsuarioModel.from_json(request.get_json())
+            payload = request.get_json() or {}
+            errors, cleaned = UsuarioModel.validate_numeric_fields(payload, required=True)
+            if errors:
+                return {'error': 'Datos inválidos', 'fields': errors}, 400
+            payload.update(cleaned)
+            usuario = UsuarioModel.from_json(payload)
             db.session.add(usuario)
             db.session.commit()
             return usuario.to_json(), 201
@@ -122,18 +133,22 @@ class UsuarioActual(Resource):
         current_identity = get_jwt_identity()
         if current_identity:
             usuario = db.session.query(UsuarioModel).get_or_404(current_identity)
-            data = request.get_json().items()
+            payload = request.get_json() or {}
+            errors, cleaned = UsuarioModel.validate_numeric_fields(payload)
+            if errors:
+                return {'error': 'Datos inválidos', 'fields': errors}, 400
+            data = payload.items()
             for key, value in data:
                 # Solo permitir actualizar ciertos campos
                 if key in ['nombre', 'apellido', 'email', 'edad']:
+                    if key in cleaned:
+                        value = cleaned[key]
                     setattr(usuario, key, value)
             db.session.add(usuario)
             db.session.commit()
             return usuario.to_json(), 201
         else:
             return {'message': 'Usuario no autenticado'}, 401
-
-
 
 
 

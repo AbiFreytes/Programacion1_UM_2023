@@ -41,6 +41,10 @@
                       <span class="input-group-text"><i class="far fa-envelope"></i></span>
                       <input formControlName="email" type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Tu correo electrónico">
                   </div>
+                  <div class="text-danger small mt-1" *ngIf="signupForm.get('email')?.touched && signupForm.get('email')?.errors">
+                    <div *ngIf="signupForm.get('email')?.errors?.['required']">El email es obligatorio.</div>
+                    <div *ngIf="signupForm.get('email')?.errors?.['email']">El email no tiene un formato válido.</div>
+                  </div>                  
                 </div>
 
                 <div class="mb-3">
@@ -55,7 +59,13 @@
                     <label for="exampleInputPassword1" class="form-label text-white">Edad</label>
                     <div class="input-group">
                       <span class="input-group-text"><i class="fa-solid fa-arrow-down-1-9 fa-2xs"></i></span>
-                      <input formControlName="edad" type="int" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Tu edad">
+                      <input formControlName="edad" type="number" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Tu edad">
+                    </div>
+                    <div class="text-danger small mt-1" *ngIf="signupForm.get('edad')?.touched && signupForm.get('edad')?.errors">
+                      <div *ngIf="signupForm.get('edad')?.errors?.['required']">La edad es obligatoria.</div>
+                      <div *ngIf="signupForm.get('edad')?.errors?.['pattern']">La edad debe ser un número.</div>
+                      <div *ngIf="signupForm.get('edad')?.errors?.['min']">La edad mínima es 1.</div>
+                      <div *ngIf="signupForm.get('edad')?.errors?.['max']">La edad máxima es 120.</div>
                     </div>
                 </div>
                 
@@ -63,12 +73,16 @@
                     <label for="exampleInputPassword1" class="form-label text-white">DNI</label>
                     <div class="input-group">
                       <span class="input-group-text"><i class="fa-regular fa-address-card fa-xs"></i></span>
-                      <input formControlName="dni" type="int" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Tu DNI">
+                      <input formControlName="dni" type="number" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Tu DNI">
+                    </div>
+                    <div class="text-danger small mt-1" *ngIf="signupForm.get('dni')?.touched && signupForm.get('dni')?.errors">
+                      <div *ngIf="signupForm.get('dni')?.errors?.['required']">El DNI es obligatorio.</div>
+                      <div *ngIf="signupForm.get('dni')?.errors?.['pattern']">El DNI debe ser un número.</div>
                     </div>
                 </div>
                 
                 <div class="d-grid d-flex justify-content-center p-3">
-                    <button type="submit" class="btn text-white button-login p-2 w-50">Crear Cuenta <i class="fa-solid fa-arrow-right fa-xs"></i></button>
+                    <button type="submit" class="btn text-white button-login p-2 w-50" [disabled]="signupForm.invalid">Crear Cuenta <i class="fa-solid fa-arrow-right fa-xs"></i></button>
                 </div>
             </form>
         </div>

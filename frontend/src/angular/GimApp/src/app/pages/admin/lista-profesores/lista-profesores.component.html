@@ -155,6 +155,12 @@
                                        id="editEdad" 
                                        formControlName="edad"
                                        min="1" max="120">
+                                <div class="text-danger small mt-1" *ngIf="editForm.get('edad')?.touched && editForm.get('edad')?.errors">
+                                    <div *ngIf="editForm.get('edad')?.errors?.['required']">La edad es obligatoria.</div>
+                                    <div *ngIf="editForm.get('edad')?.errors?.['pattern']">La edad debe ser un número.</div>
+                                    <div *ngIf="editForm.get('edad')?.errors?.['min']">La edad mínima es 1.</div>
+                                    <div *ngIf="editForm.get('edad')?.errors?.['max']">La edad máxima es 120.</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -166,6 +172,10 @@
                                        class="form-control bg-dark text-white border-secondary" 
                                        id="editDni" 
                                        formControlName="dni">
+                                <div class="text-danger small mt-1" *ngIf="editForm.get('dni')?.touched && editForm.get('dni')?.errors">
+                                    <div *ngIf="editForm.get('dni')?.errors?.['required']">El DNI es obligatorio.</div>
+                                    <div *ngIf="editForm.get('dni')?.errors?.['pattern']">El DNI debe ser un número.</div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">

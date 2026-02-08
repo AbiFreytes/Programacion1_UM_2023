@@ -34,7 +34,12 @@ def login():
 @auth.route('/register', methods=['POST'])
 def register():
     #Obtener animal
-    usuario = UsuarioModel.from_json(request.get_json())
+    payload = request.get_json() or {}
+    errors, cleaned = UsuarioModel.validate_numeric_fields(payload, required=True)
+    if errors:
+        return {'error': 'Datos inválidos', 'fields': errors}, 400
+    payload.update(cleaned)
+    usuario = UsuarioModel.from_json(payload)
     #Verificar si el mail ya existe en la db
     exists = db.session.query(UsuarioModel).filter(UsuarioModel.email == usuario.email).scalar() is not None
     if exists:

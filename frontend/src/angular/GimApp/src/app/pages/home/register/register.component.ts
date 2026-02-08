@@ -22,10 +22,10 @@ export class RegisterComponent {
     this.signupForm = this.formBuilder.group({
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
-      email: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
       contrasena: ['', Validators.required],
-      edad: ['', Validators.required],
-      dni: ['', Validators.required],
+      edad: ['', [Validators.required, Validators.pattern(/^\d+$/), Validators.min(1), Validators.max(120)]],
+      dni: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
     })
   }
 

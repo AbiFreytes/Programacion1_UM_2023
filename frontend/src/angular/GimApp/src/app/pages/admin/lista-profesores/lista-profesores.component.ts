@@ -30,8 +30,8 @@ export class ListaProfesoresComponent implements OnInit {
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      edad: ['', [Validators.required]],
-      dni: ['', [Validators.required]],
+      edad: ['', [Validators.required, Validators.pattern(/^\d+$/), Validators.min(1), Validators.max(120)]],
+      dni: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
       especialidad: ['', Validators.required]
     });
 
@@ -228,33 +228,7 @@ export class ListaProfesoresComponent implements OnInit {
 
   // Método para validar el formulario manualmente
   isFormValid(): boolean {
-    if (!this.editForm) return false;
-    
-    const formValue = this.editForm.value;
-    const isValid = formValue.nombre && 
-                   formValue.apellido && 
-                   formValue.email && 
-                   formValue.edad && 
-                   formValue.dni &&
-                   this.isValidEmail(formValue.email);
-    
-    console.log('Validación manual:', {
-      nombre: formValue.nombre,
-      apellido: formValue.apellido,
-      email: formValue.email,
-      edad: formValue.edad,
-      dni: formValue.dni,
-      emailValid: this.isValidEmail(formValue.email),
-      isValid: isValid
-    });
-    
-    return isValid;
-  }
-
-  // Método para validar email
-  private isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+     return this.editForm?.valid ?? false;
   }
 
   // Método para cerrar el modal

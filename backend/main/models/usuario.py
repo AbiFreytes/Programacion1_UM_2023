@@ -31,14 +31,42 @@ class Usuario(db.Model):
 
     def __repr__(self):
         return '<Usuario: %r >' % (self.nombre)
+
+    @staticmethod
+    def _safe_int(value):
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return None
+    
+    @staticmethod
+    def validate_numeric_fields(payload, required=False):
+        errors = {}
+        cleaned = {}
+        for field in ("dni", "edad"):
+            if field not in payload:
+                if required:
+                    errors[field] = "Campo requerido."
+                continue
+            value = payload.get(field)
+            if value is None:
+                if required:
+                    errors[field] = "Campo requerido."
+                continue
+            try:
+                cleaned[field] = int(value)
+            except (TypeError, ValueError):
+                errors[field] = "Debe ser un número entero."
+        return errors, cleaned
+
     #Convertir objeto en JSON
     def to_json(self):
         usuario_json = {
             'id': self.id,
             'nombre': str(self.nombre),
             'apellido': str(self.apellido),
-            'dni': int(self.dni),
-            'edad': int(self.edad),
+            'dni': self._safe_int(self.dni),
+            'edad': self._safe_int(self.edad),
             'email':str(self.email),
             'contrasena': str(self.contrasena),
             'rol': str(self.rol),
@@ -53,8 +81,8 @@ class Usuario(db.Model):
             'id': self.id,
             'nombre': str(self.nombre),
             'apellido': str(self.apellido),
-            'dni': int(self.dni),
-            'edad': int(self.edad),
+            'dni': self._safe_int(self.dni),
+            'edad': self._safe_int(self.edad),
             'email':str(self.email),
             'contrasena': str(self.contrasena),
             'r_alumno':r_alumno,
