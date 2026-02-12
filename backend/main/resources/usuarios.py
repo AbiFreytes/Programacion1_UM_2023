@@ -23,9 +23,13 @@ class Usuario(Resource): #A la clase usuario le indico que va a ser del tipo rec
     @role_required(roles = ["admin"])
     def delete(self, id):
         usuario = db.session.query(UsuarioModel).get_or_404(id)
-        db.session.delete(usuario)
-        db.session.commit()
-        return '', 204
+        try:
+            db.session.delete(usuario)
+            db.session.commit()
+            return '', 204
+        except Exception as error:
+            db.session.rollback()
+            return {'error': 'No se pudo eliminar el usuario', 'message': str(error)}, 409
     
     #Modificar el recurso usuario
     @role_required(roles = ["admin"])

@@ -14,7 +14,7 @@ class Planificacion(db.Model):
     
     # Relación con alumno específico (muchas planificaciones por alumno)
     id_alumno = db.Column(db.Integer, db.ForeignKey('alumno.id'), nullable=False)
-    alumno = db.relationship('Alumno', backref=db.backref('planificaciones', lazy='dynamic'))
+    alumno = db.relationship('Alumno', back_populates='planificaciones')
     
     # Relación con profesor que creó la planificación
     id_profesor = db.Column(db.Integer, db.ForeignKey('profesor.id'), nullable=False)

@@ -6,6 +6,11 @@ class Alumno(db.Model):
     id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id'))
     r_usuario = db.relationship("Usuario", back_populates="r_alumno")
     nro_socio = db.Column(db.String(20), unique=True, nullable=False)
+    planificaciones = db.relationship(
+        'Planificacion',
+        back_populates='alumno',
+        cascade='all, delete-orphan'
+    )
     
 
      #animal = db.relationship("Animal", back_populates="historias", uselist=False, single_parent=True)
