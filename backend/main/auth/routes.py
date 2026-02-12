@@ -49,9 +49,14 @@ def register():
             #Agregar usuario a DB
             db.session.add(usuario)
             db.session.commit()
-            #Enviar mail de bienvenida
-            sent = sendMail([usuario.email],"Bienvenido!",'register',usuario = usuario)
         except Exception as error:
             db.session.rollback()
             return str(error), 409
+        
+        #Intentar enviar mail de bienvenida sin bloquear el registro
+        try:
+            sendMail([usuario.email], "Bienvenido!", 'register', usuario=usuario)
+        except Exception as error:
+            print(f"No se pudo enviar el mail de bienvenida: {error}")
+
         return usuario.to_json() , 201
