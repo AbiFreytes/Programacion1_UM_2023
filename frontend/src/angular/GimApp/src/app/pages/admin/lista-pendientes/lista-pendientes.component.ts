@@ -21,24 +21,73 @@ export class ListaPendientesComponent implements OnInit {
   ngOnInit() {
     this.loadPendientes(this.currentPage); 
   }
+  
+  private requestNroSocio(): string | null {
+    const nroSocio = prompt('Ingresá el número de socio (formato SOC-XXXX):');
+
+    if (nroSocio === null) {
+      return null;
+    }
+
+    const nroSocioLimpio = nroSocio.trim().toUpperCase();
+    const pattern = /^SOC-\d{4}$/;
+
+    if (!pattern.test(nroSocioLimpio)) {
+      alert('Formato inválido. Debe ser SOC-XXXX (por ejemplo SOC-0001).');
+      return null;
+    }
+
+    return nroSocioLimpio;
+  }
+
+  private removePendienteFromList(userId: number) {
+    const index = this.arrayPendientes.findIndex((u: { id: number; }) => u.id === userId);
+    if (index !== -1) {
+      this.arrayPendientes.splice(index, 1);
+    }
+  }
 
   asignarRol(usuario: any, rol: string) {
-    this.usuariosService.putRol(usuario.id, rol).subscribe(
-      (response) => {
-        console.log(`Rol ${rol} asignado al usuario ${usuario.nombre}`);
-        
-        // Si el rol es 'alumno', crear también el registro en la tabla de alumnos
-        if (rol === 'alumno') {
-          this.usuariosService.postAlumnos(usuario.id).subscribe(
-            (alumnoResponse) => {
-              console.log(`Alumno creado en la tabla de alumnos:`, alumnoResponse);
+    if (rol === 'alumno') {
+      const nroSocio = this.requestNroSocio();
+
+      if (!nroSocio) {
+        return;
+      }
+
+      this.usuariosService.postAlumnos(usuario.id, nroSocio).subscribe(
+        (alumnoResponse) => {
+          console.log(`Alumno creado en la tabla de alumnos:`, alumnoResponse);
+          this.usuariosService.putRol(usuario.id, rol).subscribe(
+            () => {
+              console.log(`Rol ${rol} asignado al usuario ${usuario.nombre}`);
+              this.removePendienteFromList(usuario.id);
             },
-            (alumnoError) => {
-              console.log('Error al crear alumno:', alumnoError);
+            (rolError) => {
+              console.log('Error al asignar rol:', rolError);
+              alert('Se creó el alumno, pero no se pudo asignar el rol.');
             }
           );
+        },
+        (alumnoError) => {
+          console.log('Error al crear alumno:', alumnoError);
+          if (alumnoError?.status === 409) {
+            const retry = confirm((alumnoError?.error?.message || 'El número de socio ya existe.') + ' ¿Querés ingresar otro número de socio?');
+            if (retry) {
+              this.asignarRol(usuario, 'alumno');
+            }
+            return;
+          }
+          alert(alumnoError?.error?.message || 'No se pudo crear el alumno.');
         }
-        
+      );
+      return;
+    }
+
+    this.usuariosService.putRol(usuario.id, rol).subscribe(
+      () => {
+        console.log(`Rol ${rol} asignado al usuario ${usuario.nombre}`);
+
         // Si el rol es 'profesor', crear también el registro en la tabla de profesores
         if (rol === 'profesor') {
           this.usuariosService.postProfesores(usuario.id, 'General').subscribe(
@@ -50,12 +99,7 @@ export class ListaPendientesComponent implements OnInit {
             }
           );
         }
-        
-        // Actualizar lista
-        const index = this.arrayPendientes.findIndex((u: { id: number; }) => u.id === usuario.id);
-        if (index !== -1) {
-        this.arrayPendientes.splice(index, 1);
-        }
+        this.removePendienteFromList(usuario.id);
       },
       (error) => {
         console.log('Error al asignar rol:', error);
