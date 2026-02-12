@@ -5,6 +5,7 @@ from main.models import AlumnoModel, PlanificacionModel, UsuarioModel
 from sqlalchemy import func, desc, asc
 from main.auth.decorators import role_required
 from flask_jwt_extended import jwt_required, get_jwt_identity
+
 class UsuariosAlumnos(Resource):
     #obtener lista de los alumnos
     @jwt_required()

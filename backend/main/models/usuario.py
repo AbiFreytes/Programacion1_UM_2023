@@ -60,7 +60,7 @@ class Usuario(db.Model):
         return errors, cleaned
 
     #Convertir objeto en JSON
-    def to_json(self):
+    def to_json(self, include_password=False):
         usuario_json = {
             'id': self.id,
             'nombre': str(self.nombre),
@@ -68,13 +68,14 @@ class Usuario(db.Model):
             'dni': self._safe_int(self.dni),
             'edad': self._safe_int(self.edad),
             'email':str(self.email),
-            'contrasena': str(self.contrasena),
             'rol': str(self.rol),
             'suspendido': bool(self.suspendido)
         }
+        if include_password:
+            usuario_json['contrasena'] = str(self.contrasena)
         return usuario_json
 
-    def to_json_complete(self):
+    def to_json_complete(self, include_password=False):
         r_alumno = [r_alumno.to_json() for r_alumno in self.r_alumno]
         r_profesor = [r_profesor.to_json() for r_profesor in self.r_profesor]
         usuario_json = {
@@ -84,10 +85,11 @@ class Usuario(db.Model):
             'dni': self._safe_int(self.dni),
             'edad': self._safe_int(self.edad),
             'email':str(self.email),
-            'contrasena': str(self.contrasena),
             'r_alumno':r_alumno,
             'r_profesor':r_profesor
         }
+        if include_password:
+            usuario_json['contrasena'] = str(self.contrasena)
         return usuario_json
 
     def to_json_short(self):

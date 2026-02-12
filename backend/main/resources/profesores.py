@@ -39,7 +39,22 @@ class UsuariosProfesores(Resource):
         
         profesores = profesores.paginate(page=page, per_page=per_page, error_out=True, max_per_page=30)
 
-        return jsonify({'profesores': [profesor.to_json() for profesor in profesores],
+        profesores_json = [profesor.to_json() for profesor in profesores]
+        usuarios_json = []
+        for profesor in profesores_json:
+            usuario = profesor.get('usuario', {})
+            usuario_legacy = {
+                **usuario,
+                'r_profesor': [{
+                    'id': profesor.get('id'),
+                    'id_usuario': profesor.get('id_usuario'),
+                    'especialidad': profesor.get('especialidad')
+                }]
+            }
+            usuarios_json.append(usuario_legacy)
+
+        return jsonify({'profesores': profesores_json,
+                  'usuarios': usuarios_json,
                   'total': profesores.total,
                   'pages': profesores.pages,
                   'page': page
